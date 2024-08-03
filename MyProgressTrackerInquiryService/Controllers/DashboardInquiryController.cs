@@ -8,7 +8,7 @@ namespace MyProgressTrackerInquiryService.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class DashboardInquiryController : ControllerBase
+	public class DashboardInquiryController : Controller
 	{
 		private DashboardInquiryServiceCore _serviceCore;
 
@@ -33,7 +33,7 @@ namespace MyProgressTrackerInquiryService.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
-		[HttpGet("getAllCourses")]
+		[HttpPost("getAllCourses")]
 		public ActionResult<GetAllCoursesRes> GetAllCourses([FromBody] GetAllCoursesReq request)
 		{
 			try

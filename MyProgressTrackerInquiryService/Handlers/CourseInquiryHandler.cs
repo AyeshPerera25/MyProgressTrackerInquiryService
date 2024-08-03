@@ -3,6 +3,7 @@ using MyProgressTrackerAuthenticationService.Models.Entities;
 using MyProgressTrackerInquiryService.DataResources;
 using MyProgressTrackerInquiryService.Models.DataTransferObjects;
 using MyProgressTrackerInquiryService.Models.Entities;
+using System.Transactions;
 
 namespace MyProgressTrackerInquiryService.Handlers
 {
@@ -22,8 +23,9 @@ namespace MyProgressTrackerInquiryService.Handlers
 			Session session = validateSession(request);
 			validateAddCourseReq(request);
 			course = populateCourse(request, session);
-			session.LastLoginTime = DateTime.Now;
 			persistCourseData(course,session);
+			persistSessionUpdate(session);
+			CommitData();
 
 			response.IsRequestSuccess = true;
 			response.Description = "Success!";
@@ -32,13 +34,16 @@ namespace MyProgressTrackerInquiryService.Handlers
 			return response;
 		}
 
+		private void CommitData()
+		{
+			_dbContext.SaveChanges();
+		}
+
 		private void persistCourseData(Course course, Session session)
 		{
 			if (course != null)
 			{
 				_dbContext.Courses.Add(course);
-				_dbContext.Sessions.Update(session);
-				_dbContext.SaveChanges();
 			}
 			else
 			{
@@ -60,12 +65,12 @@ namespace MyProgressTrackerInquiryService.Handlers
 			return course;
 		}
 
-		private Session validateSession(AddCourseReq request)
+		private Session validateSession(RequestWrapper request)
 		{
 			Session session = null;
 			if (request == null)
 			{
-				throw new Exception("New Course Request req is Null!");
+				throw new Exception("Request is Null!");
 			}
 			if (request.SessionKey == null)
 			{
@@ -73,7 +78,11 @@ namespace MyProgressTrackerInquiryService.Handlers
 			}
 			if (_dbContext.Sessions.Any())
 			{
-				session = _dbContext.Sessions.SingleOrDefault<Session>(session => session.SessionKey == request.SessionKey);
+				List<Session> sessionList = _dbContext.Sessions.Where<Session>(sess => sess.SessionKey == request.SessionKey).ToList();
+				if(sessionList.Any())
+				{
+					session = sessionList.First(sess => sess.UserId == request.UserId);
+				}
 			}
 			else
 			{
@@ -83,7 +92,7 @@ namespace MyProgressTrackerInquiryService.Handlers
 			{
 				throw new Exception("Invalid Session Key!");
 			}
-			if (session.LoginStatus) 
+			if (!session.LoginStatus) 
 			{
 				throw new Exception("Session Inactivated!");
 			}
@@ -119,18 +128,57 @@ namespace MyProgressTrackerInquiryService.Handlers
 		internal GetAllCoursesRes? getAllUserCourses(GetAllCoursesReq request)
 		{
 			GetAllCoursesRes response = new GetAllCoursesRes();
+			Session session = validateSession(request);
 			validateGetAllCoursesReq(request);
+			List<Course> courses = populateAllCourses(session);
+			validateAllCourses(courses);
+			persistSessionUpdate(session);
+			CommitData();
 
-
-
-
+			response.IsRequestSuccess = true;
+			response.Description = "Success!";
+			response.CourseList = courses;
 
 			return response;
 		}
 
+		private void persistSessionUpdate(Session session)
+		{
+			if (session != null)
+			{
+				session.LastLoginTime = DateTime.Now;
+				_dbContext.Sessions.Update(session);
+			}
+			else
+			{
+				throw new Exception("Null Session Entity to persist");
+			}
+			
+		}
+
+		private void validateAllCourses(List<Course> courses)
+		{
+			if (courses == null)
+			{
+				throw new Exception("Course Loading Error!");
+			}
+			if (courses.Count == 0)
+			{
+				throw new Exception("No Courses Has Found!");
+			}
+		}
+
+		private List<Course> populateAllCourses(Session session)
+		{
+			return _dbContext.Courses.Where(course => course.UserId == session.UserId).ToList();
+		}
+
 		private void validateGetAllCoursesReq(GetAllCoursesReq request)
 		{
-			throw new NotImplementedException();
+			if (request.UserId <= 0L)
+			{
+				throw new Exception("Invalid User ID!");
+			}
 		}
 	}
 }

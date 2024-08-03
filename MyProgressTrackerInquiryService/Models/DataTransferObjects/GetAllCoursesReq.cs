@@ -5,7 +5,6 @@ namespace MyProgressTrackerInquiryService.Models.DataTransferObjects
 {
 	public class GetAllCoursesReq : RequestWrapper
 	{
-		[Required]
-		public long UserId { get; set; }
+	
 	}
 }

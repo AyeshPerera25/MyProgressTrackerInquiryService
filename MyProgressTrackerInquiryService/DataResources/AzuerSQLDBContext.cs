@@ -18,6 +18,16 @@ namespace MyProgressTrackerInquiryService.DataResources
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
+			// This configures EF Core to map the User entity to the existing Users table, without trying to create it
+			modelBuilder.Entity<User>().ToTable("Users", t => t.ExcludeFromMigrations());
+			modelBuilder.Entity<Session>().ToTable("Sessions", t => t.ExcludeFromMigrations());
+
+			// Define the foreign key relationship in Course
+			modelBuilder.Entity<Course>()
+				.HasOne(c => c.User)
+				.WithMany() // Or specify the inverse navigation property
+				.HasForeignKey(c => c.UserId);
+
 			base.OnModelCreating(modelBuilder);
 			// Additional configuration can be done here
 		}
