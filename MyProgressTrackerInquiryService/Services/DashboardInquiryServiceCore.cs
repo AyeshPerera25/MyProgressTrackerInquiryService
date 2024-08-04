@@ -5,15 +5,19 @@ using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
 
 namespace MyProgressTrackerInquiryService.Services
 {
-	public class DashboardInquiryServiceCore
+	public class DashboardInquiryServiceCore 
 	{
 		private readonly ReportInquiryHandler _reportHandler;
 		private readonly CourseInquiryHandler _courseInquiryHandler;
+		private readonly SubjectInquiryHandler _subjectInquiryHandler;
+		private readonly StudySessionInquiryHandler _studySessionInquiryHandler;
 
-		public DashboardInquiryServiceCore(ReportInquiryHandler reportHandler, CourseInquiryHandler courseInquiryHandler)
+		public DashboardInquiryServiceCore(ReportInquiryHandler reportHandler, CourseInquiryHandler courseInquiryHandler, SubjectInquiryHandler subjectInquiryHandler, StudySessionInquiryHandler studySessionInquiryHandler)
 		{
 			_reportHandler = reportHandler;
 			_courseInquiryHandler = courseInquiryHandler;
+			_subjectInquiryHandler = subjectInquiryHandler;
+			_studySessionInquiryHandler = studySessionInquiryHandler;
 		}
 
 		public ProgressReportRes GetProgressReport(ProgressReportReq request)
@@ -62,6 +66,70 @@ namespace MyProgressTrackerInquiryService.Services
 			}
 			return response;
 
+		}
+
+		internal GetAllSubjectsRes GetAllSubjects(GetAllSubjectsReq request)
+		{
+			GetAllSubjectsRes response = null;
+			try
+			{
+				response = _subjectInquiryHandler.getAllUserSubjects(request);
+			}
+			catch (Exception ex)
+			{
+				response = new GetAllSubjectsRes();
+				response.IsRequestSuccess = false;
+				response.Description = ex.Message;
+			}
+			return response;
+		}
+
+		internal AddNewSubjectRes AddNewSubject(AddNewSubjectReq request)
+		{
+			AddNewSubjectRes response = null;
+			try
+			{
+				response = _subjectInquiryHandler.addSubject(request);
+			}
+			catch (Exception ex)
+			{
+				response = new AddNewSubjectRes();
+				response.IsRequestSuccess = false;
+				response.Description = ex.Message;
+			}
+			return response;
+		}
+
+		internal GetAllStudySessionsRes GetAllStudySessions(GetAllStudySessionsReq request)
+		{
+			GetAllStudySessionsRes response = null;
+			try
+			{
+				response = _studySessionInquiryHandler.getAllUserStudySessions(request);
+			}
+			catch (Exception ex)
+			{
+				response = new GetAllStudySessionsRes();
+				response.IsRequestSuccess = false;
+				response.Description = ex.Message;
+			}
+			return response;
+		}
+
+		internal AddStudySessionRes AddNewStudySession(AddStudySessionReq request)
+		{
+			AddStudySessionRes response = null;
+			try
+			{
+				response = _studySessionInquiryHandler.addStudySession(request);
+			}
+			catch (Exception ex)
+			{
+				response = new AddStudySessionRes();
+				response.IsRequestSuccess = false;
+				response.Description = ex.Message;
+			}
+			return response;
 		}
 	}
 }

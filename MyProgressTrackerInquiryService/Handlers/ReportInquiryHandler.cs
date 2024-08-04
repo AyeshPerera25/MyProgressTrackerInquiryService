@@ -61,12 +61,33 @@ namespace MyProgressTrackerInquiryService.Handlers
 
 		private List<Subject> populateSubjects(User user)
 		{
-			return _dbContext.Subjects.Where(sub => sub.Course.UserId == user.UserId).ToList();
+			Course course;
+			List<Subject> subjectList = _dbContext.Subjects.Where(sub => sub.Course.UserId == user.UserId).ToList();
+			if (subjectList.Count > 0)
+			{
+				foreach (Subject subject in subjectList)
+				{
+					course = _dbContext.Courses.SingleOrDefault<Course>( cours => cours.CourseId == subject.CourseId);
+					if (course == null)
+					{
+						throw new Exception("Course not found for CourseID: " + subject.CourseId);
+					}
+					subject.Course = course;	
+				}
+			}
+			return subjectList;
 		}
 
 		private List<StudySession> populateUserStudySessions(User user)
 		{
-			return	_dbContext.StudySessions.Where(session => session.Subject.Course.UserId == user.UserId).ToList();
+			if (_dbContext.StudySessions.Any())
+			{
+				return _dbContext.StudySessions.Where(session => session.Subject.Course.UserId == user.UserId).ToList();
+			}
+			else
+			{
+				throw new Exception("No StudySessions Has Registerd Yet!");
+			}
 		}
 
 		private User validateProgressReportRequest(ProgressReportReq request)

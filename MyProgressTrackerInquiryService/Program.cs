@@ -20,6 +20,8 @@ namespace MyProgressTrackerInquiryService
 			builder.Services.AddTransient<DashboardInquiryServiceCore>();
 			builder.Services.AddScoped<ReportInquiryHandler>();
 			builder.Services.AddScoped<CourseInquiryHandler>();
+			builder.Services.AddScoped<SubjectInquiryHandler>();
+			builder.Services.AddScoped<StudySessionInquiryHandler>();
 			builder.Services.AddEndpointsApiExplorer();
 			builder.Services.AddSwaggerGen();
 

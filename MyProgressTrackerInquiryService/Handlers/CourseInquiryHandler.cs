@@ -14,14 +14,16 @@ namespace MyProgressTrackerInquiryService.Handlers
 			_dbContext = dbContext;
 		}
 
-		internal AddCourseRes addCourse(AddCourseReq request)
+		//---------------------------------------------------------------------------------------------------------------------------------------- ( Course Inquiry )----------------
+
+		internal AddCourseRes addCourse(AddCourseReq request) //============================== Add Course
 		{
 			AddCourseRes response = new AddCourseRes();
 			Course course;
 			Session session = validateSession(request);
 			validateAddCourseReq(request);
 			course = populateCourse(request, session);
-			persistCourseData(course,session);
+			persistCourseData(course);
 			persistSessionUpdate(session);
 			CommitData();
 
@@ -32,12 +34,7 @@ namespace MyProgressTrackerInquiryService.Handlers
 			return response;
 		}
 
-		private void CommitData()
-		{
-			_dbContext.SaveChanges();
-		}
-
-		private void persistCourseData(Course course, Session session)
+		private void persistCourseData(Course course)
 		{
 			if (course != null)
 			{
@@ -63,49 +60,6 @@ namespace MyProgressTrackerInquiryService.Handlers
 			return course;
 		}
 
-		private Session validateSession(RequestWrapper request)
-		{
-			Session session = null;
-			if (request == null)
-			{
-				throw new Exception("Request is Null!");
-			}
-			if (request.SessionKey == null)
-			{
-				throw new Exception("Session Key Not Found!");
-			}
-			if (_dbContext.Sessions.Any())
-			{
-				List<Session> sessionList = _dbContext.Sessions.Where<Session>(sess => sess.SessionKey == request.SessionKey).ToList();
-				if(sessionList.Any())
-				{
-					session = sessionList.First(sess => sess.UserId == request.UserId);
-				}
-			}
-			else
-			{
-				throw new Exception("No any Session has registerd yet!!");
-			}
-			if (session == null)
-			{
-				throw new Exception("Invalid Session Key!");
-			}
-			if (!session.LoginStatus) 
-			{
-				throw new Exception("Session Inactivated!");
-			}
-			DateTime currentTime = DateTime.Now;
-			TimeSpan timeDifference = currentTime - session.LastLoginTime;
-			if (timeDifference.TotalMinutes > 30)
-			{
-				session.LoginStatus = false;
-				_dbContext.Sessions.Update(session);
-				_dbContext.SaveChanges();
-				throw new Exception("Session Expired!");
-			}
-			return session;
-		}
-
 		private void validateAddCourseReq(AddCourseReq request)
 		{
 			if (request.CourseName == null || request.CourseName == "")
@@ -123,11 +77,11 @@ namespace MyProgressTrackerInquiryService.Handlers
 			
 		}
 
-		internal GetAllCoursesRes? getAllUserCourses(GetAllCoursesReq request)
+		internal GetAllCoursesRes getAllUserCourses(GetAllCoursesReq request) //============================== Get All Courses
 		{
 			GetAllCoursesRes response = new GetAllCoursesRes();
 			Session session = validateSession(request);
-			validateGetAllCoursesReq(request);
+			validateReqUserID(request);
 			List<Course> courses = populateAllCourses(session);
 			validateAllCourses(courses);
 			persistSessionUpdate(session);
@@ -138,20 +92,6 @@ namespace MyProgressTrackerInquiryService.Handlers
 			response.CourseList = courses;
 
 			return response;
-		}
-
-		private void persistSessionUpdate(Session session)
-		{
-			if (session != null)
-			{
-				session.LastLoginTime = DateTime.Now;
-				_dbContext.Sessions.Update(session);
-			}
-			else
-			{
-				throw new Exception("Null Session Entity to persist");
-			}
-			
 		}
 
 		private void validateAllCourses(List<Course> courses)
@@ -168,15 +108,85 @@ namespace MyProgressTrackerInquiryService.Handlers
 
 		private List<Course> populateAllCourses(Session session)
 		{
-			return _dbContext.Courses.Where(course => course.UserId == session.UserId).ToList();
+			if (_dbContext.Courses.Any())
+			{
+				return _dbContext.Courses.Where(course => course.UserId == session.UserId).ToList();
+			}
+			else
+			{
+				throw new Exception("No Courses Has Registerd Yet!");
+			}
 		}
 
-		private void validateGetAllCoursesReq(GetAllCoursesReq request)
+		//---------------------------------------------------------------------------------------------------------------------------------------- ( Commen Methods )----------------
+		private void validateReqUserID(RequestWrapper request)
 		{
 			if (request.UserId <= 0L)
 			{
 				throw new Exception("Invalid User ID!");
 			}
+		}
+
+		private Session validateSession(RequestWrapper request)
+		{
+			Session session = null;
+			if (request == null)
+			{
+				throw new Exception("Request is Null!");
+			}
+			if (request.SessionKey == null)
+			{
+				throw new Exception("Session Key Not Found!");
+			}
+			if (_dbContext.Sessions.Any())
+			{
+				List<Session> sessionList = _dbContext.Sessions.Where<Session>(sess => sess.SessionKey == request.SessionKey).ToList();
+				if (sessionList.Any())
+				{
+					session = sessionList.First(sess => sess.UserId == request.UserId);
+				}
+			}
+			else
+			{
+				throw new Exception("No any Session has registerd yet!!");
+			}
+			if (session == null)
+			{
+				throw new Exception("Invalid Session Key!");
+			}
+			if (!session.LoginStatus)
+			{
+				throw new Exception("Session Inactivated!");
+			}
+			DateTime currentTime = DateTime.Now;
+			TimeSpan timeDifference = currentTime - session.LastLoginTime;
+			if (timeDifference.TotalMinutes > 30)
+			{
+				session.LoginStatus = false;
+				_dbContext.Sessions.Update(session);
+				_dbContext.SaveChanges();
+				throw new Exception("Session Expired!");
+			}
+			return session;
+		}
+
+		private void persistSessionUpdate(Session session)
+		{
+			if (session != null)
+			{
+				session.LastLoginTime = DateTime.Now;
+				_dbContext.Sessions.Update(session);
+			}
+			else
+			{
+				throw new Exception("Null Session Entity to persist");
+			}
+
+		}
+
+		private void CommitData()
+		{
+			_dbContext.SaveChanges();
 		}
 	}
 }
