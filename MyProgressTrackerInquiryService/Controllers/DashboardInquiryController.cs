@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MyProgressTrackerAuthenticationService.Models.DataTransferObjects;
-using MyProgressTrackerInquiryService.Models.DataTransferObjects;
+using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
 using MyProgressTrackerInquiryService.Services;
 
 namespace MyProgressTrackerInquiryService.Controllers

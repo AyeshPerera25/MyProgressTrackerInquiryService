@@ -1,7 +1,6 @@
-﻿using MyProgressTrackerAuthenticationService.Models.Entities;
+﻿using MyProgressTrackerDependanciesLib.Models.Entities;
 using MyProgressTrackerInquiryService.DataResources;
-using MyProgressTrackerInquiryService.Models.DataTransferObjects;
-using MyProgressTrackerInquiryService.Models.Entities;
+using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
 
 namespace MyProgressTrackerInquiryService.Handlers
 {

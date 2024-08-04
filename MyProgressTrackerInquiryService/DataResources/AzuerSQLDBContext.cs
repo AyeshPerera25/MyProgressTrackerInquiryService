@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MyProgressTrackerAuthenticationService.Models.Entities;
-using MyProgressTrackerInquiryService.Models.Entities;
+using MyProgressTrackerDependanciesLib.Models.Entities;
+using MyProgressTrackerDependanciesLib.Models.Entities;
 
 namespace MyProgressTrackerInquiryService.DataResources
 {

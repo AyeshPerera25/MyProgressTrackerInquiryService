@@ -21,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="MyProgressTrackerAuthenticationService">
-      <HintPath>..\..\MyProgressTrackerAuthenticationService\MyProgressTrackerAuthenticationService\bin\Debug\net8.0\MyProgressTrackerAuthenticationService.dll</HintPath>
+    <Reference Include="MyProgressTrackerDependanciesLib">
+      <HintPath>..\..\MyProgressTrackerDependanciesLib\MyProgressTrackerDependanciesLib\bin\Debug\net8.0\MyProgressTrackerDependanciesLib.dll</HintPath>
     </Reference>
   </ItemGroup>
 
