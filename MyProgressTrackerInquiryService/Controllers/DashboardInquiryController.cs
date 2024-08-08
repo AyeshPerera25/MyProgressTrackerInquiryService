@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MyProgressTrackerAuthenticationService.Models.DataTransferObjects;
-using MyProgressTrackerInquiryService.Models.DataTransferObjects;
+using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
 using MyProgressTrackerInquiryService.Services;
 
 namespace MyProgressTrackerInquiryService.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
-	public class DashboardInquiryController : ControllerBase
+	public class DashboardInquiryController : Controller
 	{
 		private DashboardInquiryServiceCore _serviceCore;
 
@@ -17,7 +16,7 @@ namespace MyProgressTrackerInquiryService.Controllers
 			_serviceCore = serviceCore;
 		}
 
-		[HttpGet("getProgressReport")]
+		[HttpPost("getProgressReport")]
 		public ActionResult<ProgressReportRes> GetProgressReport([FromBody] ProgressReportReq request)
 		{
 			try
@@ -33,7 +32,8 @@ namespace MyProgressTrackerInquiryService.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
-		[HttpGet("getAllCourses")]
+
+		[HttpPost("getAllCourses")]
 		public ActionResult<GetAllCoursesRes> GetAllCourses([FromBody] GetAllCoursesReq request)
 		{
 			try
@@ -66,6 +66,75 @@ namespace MyProgressTrackerInquiryService.Controllers
 				return BadRequest(ex.Message);
 			}
 		}
+
+		[HttpPost("getAllSubjects")]
+		public ActionResult<GetAllSubjectsRes> GetAllSubjects([FromBody] GetAllSubjectsReq request)
+		{
+			try
+			{
+				if (request == null)
+				{
+					return BadRequest("Request is null");
+				}
+				return Ok(_serviceCore.GetAllSubjects(request));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpPost("addNewSubject")]
+		public ActionResult<AddNewSubjectRes> AddNewSubject([FromBody] AddNewSubjectReq request)
+		{
+			try
+			{
+				if (request == null)
+				{
+					return BadRequest("Request is null");
+				}
+				return Ok(_serviceCore.AddNewSubject(request));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpPost("getAllStudySessions")]
+		public ActionResult<GetAllStudySessionsRes> GetAllSubjects([FromBody] GetAllStudySessionsReq request)
+		{
+			try
+			{
+				if (request == null)
+				{
+					return BadRequest("Request is null");
+				}
+				return Ok(_serviceCore.GetAllStudySessions(request));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
+		[HttpPost("addNewStudySession")]
+		public ActionResult<AddStudySessionRes> AddNewStudySession([FromBody] AddStudySessionReq request)
+		{
+			try
+			{
+				if (request == null)
+				{
+					return BadRequest("Request is null");
+				}
+				return Ok(_serviceCore.AddNewStudySession(request));
+			}
+			catch (Exception ex)
+			{
+				return BadRequest(ex.Message);
+			}
+		}
+
 
 
 	}
