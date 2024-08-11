@@ -135,7 +135,58 @@ namespace MyProgressTrackerInquiryService.Controllers
 			}
 		}
 
+        [HttpPost("deleteCourse")]
+        public ActionResult<CommenResponse> deleteCourse([FromBody] DeleteCoursReq request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest("Request is null");
+                }
+                return Ok(_serviceCore.deleteCourse(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("deleteSubject")]
+        public ActionResult<CommenResponse> deleteSubject([FromBody] DeleteSubjectReq request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest("Request is null");
+                }
+                return Ok(_serviceCore.deleteSubject(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPost("deleteStudySession")]
+        public ActionResult<CommenResponse> deleteStudySession([FromBody] DeleteStudySessionReq request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest("Request is null");
+                }
+                return Ok(_serviceCore.deleteStudySession(request));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
 
-	}
+
+    }
 }

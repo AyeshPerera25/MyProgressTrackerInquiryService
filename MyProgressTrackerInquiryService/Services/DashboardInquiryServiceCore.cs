@@ -131,5 +131,56 @@ namespace MyProgressTrackerInquiryService.Services
 			}
 			return response;
 		}
-	}
+
+        internal CommenResponse deleteCourse(DeleteCoursReq request)
+        {
+            CommenResponse response = null;
+            try
+            {
+                response = _courseInquiryHandler.deleteCourse(request);
+            }
+            catch (Exception ex)
+            {
+                response = new CommenResponse();
+                response.IsRequestSuccess = false;
+                response.Description = ex.Message;
+            }
+            return response;
+        }
+
+        internal object? deleteSubject(DeleteSubjectReq request)
+        {
+
+
+            CommenResponse response = null;
+            try
+            {
+                response = _courseInquiryHandler.deleteSubject(request);
+            }
+            catch (Exception ex)
+            {
+                response = new CommenResponse();
+                response.IsRequestSuccess = false;
+                response.Description = ex.Message;
+            }
+            return response;
+        }
+
+        internal object? deleteStudySession(DeleteStudySessionReq request)
+        {
+
+            CommenResponse response = null;
+            try
+            {
+                response = _courseInquiryHandler.deleteSession(request);
+            }
+            catch (Exception ex)
+            {
+                response = new CommenResponse();
+                response.IsRequestSuccess = false;
+                response.Description = ex.Message;
+            }
+            return response;
+        }
+    }
 }

@@ -1,4 +1,5 @@
-﻿using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
+﻿using Microsoft.EntityFrameworkCore;
+using MyProgressTrackerDependanciesLib.Models.DataTransferObjects;
 using MyProgressTrackerDependanciesLib.Models.Entities;
 using MyProgressTrackerInquiryService.DataResources;
 using System.Transactions;
@@ -94,7 +95,7 @@ namespace MyProgressTrackerInquiryService.Handlers
 			return response;
 		}
 
-		private void validateAllCourses(List<Course> courses)
+        private void validateAllCourses(List<Course> courses)
 		{
 			if (courses == null)
 			{
@@ -117,9 +118,224 @@ namespace MyProgressTrackerInquiryService.Handlers
 				throw new Exception("No Courses Has Registerd Yet!");
 			}
 		}
+        public CommenResponse deleteCourse(DeleteCoursReq request) //============================== Delete Course
+        {
+            CommenResponse response = new CommenResponse();
+            Session session = validateSession(request);
+            validateCourseDeleteRequest(request);
+            Course course = populateCourseDelete(request);
 
-		//---------------------------------------------------------------------------------------------------------------------------------------- ( Commen Methods )----------------
-		private void validateReqUserID(RequestWrapper request)
+			persistDeleteCourse(course);
+            persistSessionUpdate(session);
+            CommitData();
+
+            response.IsRequestSuccess = true;
+            response.Description = "Success!";
+           
+            return response;
+        }
+
+        private void persistDeleteCourse(Course course)
+        {
+            if (course != null)
+            {
+                _dbContext.Courses.Remove(course);
+            }
+            else
+            {
+                throw new Exception("Null Course Entity to persist");
+            }
+        }
+
+        private void validateCourseDeleteRequest(DeleteCoursReq request)
+        {
+            if (request.CourseId <= 0L)
+            {
+                throw new Exception("Invalide Course Id to Delete");
+            }
+        }
+
+        private Course populateCourseDelete(DeleteCoursReq request)
+        {
+			Course course = null;
+            if (_dbContext.Courses.Any())
+            {
+                course =  _dbContext.Courses.SingleOrDefault(course => course.CourseId == request.CourseId);
+            }
+            else
+            {
+                throw new Exception("No Courses Has Registerd Yet!");
+            }
+			if (course == null)
+			{
+                throw new Exception("No Courses Has found under Course ID: "+request.CourseId);
+            }
+			
+			return course;
+        }
+
+        public CommenResponse deleteSubject(DeleteSubjectReq request)
+        {
+            CommenResponse response = new CommenResponse();
+            Session session = validateSession(request);
+            validateSubjectDeleteRequest(request);
+            Subject subject = populateSubjectDelete(request);
+
+            persistDeleteSubject(subject);
+            persistSessionUpdate(session);
+            CommitData();
+
+            response.IsRequestSuccess = true;
+            response.Description = "Success!";
+
+            return response;
+        }
+
+        private void persistDeleteSubject(Subject subject)
+        {
+            if (subject != null)
+            {
+                _dbContext.Subjects.Remove(subject);
+            }
+            else
+            {
+                throw new Exception("Null Course Entity to persist");
+            }
+        }
+
+        private Subject populateSubjectDelete(DeleteSubjectReq request)
+        {
+            Subject sub = null;
+
+            if (_dbContext.Subjects.Any())
+            {
+                sub = _dbContext.Subjects.SingleOrDefault(subject => subject.SubjectId == request.SubjectId);
+            }
+            else
+            {
+                throw new Exception("No Subject Has Registerd Yet!");
+            }
+            if (sub == null)
+            {
+                throw new Exception("No Subject Has found under Subject ID: " + request.SubjectId);
+            }
+
+            Course course = null;
+            if (_dbContext.Courses.Any())
+            {
+                course = _dbContext.Courses.SingleOrDefault(course => course.CourseId == sub.CourseId);
+            }
+            else
+            {
+                throw new Exception("No Courses Has Registerd Yet!");
+            }
+            if (course == null)
+            {
+                throw new Exception("No Courses Has found under Course ID: " + sub.CourseId);
+            }
+
+			sub.Course = course;
+
+            return sub;
+        }
+
+        private void validateSubjectDeleteRequest(DeleteSubjectReq request)
+        {
+            if (request.SubjectId <= 0L)
+            {
+                throw new Exception("Invalide Subject Id to Delete");
+            }
+        }
+
+        public CommenResponse deleteSession(DeleteStudySessionReq request)
+        {
+            CommenResponse response = new CommenResponse();
+            Session session = validateSession(request);
+            validateStudySessionDeleteRequest(request);
+            StudySession studySession = populateStudySessionDelete(request);
+
+            persistDeleteStudySession(studySession);
+            persistSessionUpdate(session);
+            CommitData();
+
+            response.IsRequestSuccess = true;
+            response.Description = "Success!";
+
+            return response;
+        }
+
+        private void persistDeleteStudySession(StudySession studySession)
+        {
+            if (studySession != null)
+            {
+                _dbContext.StudySessions.Remove(studySession);
+            }
+            else
+            {
+                throw new Exception("Null Course Entity to persist");
+            }
+        }
+
+        private StudySession populateStudySessionDelete(DeleteStudySessionReq request)
+        {
+            StudySession session = null;
+            if (_dbContext.Subjects.Any())
+            {
+                session = _dbContext.StudySessions.SingleOrDefault(session => session.SubjectId == request.StudySessionId);
+            }
+            else
+            {
+                throw new Exception("No Study Session Has Registerd Yet!");
+            }
+            if (session == null)
+            {
+                throw new Exception("No Study Session Has found under Session ID: " + request.StudySessionId);
+            }
+            Subject sub = null;
+
+            if (_dbContext.Subjects.Any())
+            {
+                sub = _dbContext.Subjects.SingleOrDefault(subject => subject.SubjectId == session.SubjectId);
+            }
+            else
+            {
+                throw new Exception("No Subject Has Registerd Yet!");
+            }
+            if (sub == null)
+            {
+                throw new Exception("No Subject Has found under Subject ID: " + session.SubjectId);
+            }
+
+            Course course = null;
+            if (_dbContext.Courses.Any())
+            {
+                course = _dbContext.Courses.SingleOrDefault(course => course.CourseId == sub.CourseId);
+            }
+            else
+            {
+                throw new Exception("No Courses Has Registerd Yet!");
+            }
+            if (course == null)
+            {
+                throw new Exception("No Courses Has found under Course ID: " + sub.CourseId);
+            }
+
+            sub.Course = course;
+            session.Subject = sub;
+
+            return session;
+        }
+
+        private void validateStudySessionDeleteRequest(DeleteStudySessionReq request)
+        {
+            if (request.StudySessionId <= 0L)
+            {
+                throw new Exception("Invalide Study Session Id to Delete");
+            }
+        }
+
+        //---------------------------------------------------------------------------------------------------------------------------------------- ( Commen Methods )----------------
+        private void validateReqUserID(RequestWrapper request)
 		{
 			if (request.UserId <= 0L)
 			{
@@ -188,5 +404,7 @@ namespace MyProgressTrackerInquiryService.Handlers
 		{
 			_dbContext.SaveChanges();
 		}
-	}
+
+        
+    }
 }
